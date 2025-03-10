@@ -1,0 +1,151 @@
+CREATE TABLE VISITANTE (
+    id_visitante INT PRIMARY KEY,
+    endereco VARCHAR(255),
+    cpf VARCHAR(14) UNIQUE
+);
+
+CREATE TABLE ACOMPANHANTE (
+    id_acompanhante INT PRIMARY KEY,
+    cpf VARCHAR(14) UNIQUE,
+    endereco VARCHAR(255),
+    id_paciente INT,
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente)
+);
+
+CREATE TABLE PACIENTE (
+    id_paciente INT PRIMARY KEY,
+    contato VARCHAR(20),
+    horario_entrada TIME,
+    cpf VARCHAR(14) UNIQUE,
+    idade INT,
+    id_acompanhante INT,
+    id_visitante INT,
+    FOREIGN KEY (id_acompanhante) REFERENCES ACOMPANHANTE(id_acompanhante),
+    FOREIGN KEY (id_visitante) REFERENCES VISITANTE(id_visitante)
+);
+
+CREATE TABLE UNIDADE (
+    id_unidade INT PRIMARY KEY,
+    cnpj VARCHAR(18) UNIQUE,
+    email VARCHAR(255),
+    numero_telefone VARCHAR(20),
+    cidade VARCHAR(100),
+    nome_unidade VARCHAR(255),
+    cep VARCHAR(10),
+    pais VARCHAR(50),
+    numero VARCHAR(10)
+);
+
+CREATE TABLE ALA (
+    id_ala INT PRIMARY KEY,
+    id_unidade INT,
+    especializacao VARCHAR(255),
+    id_funcionario INT,
+    id_paciente INT,
+    id_equipamento INT,
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario),
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente),
+    FOREIGN KEY (id_equipamento) REFERENCES EQUIPAMENTOS(id_equipamento)
+);
+
+CREATE TABLE EQUIPAMENTOS (
+    id_equipamento INT PRIMARY KEY,
+    nome_equipamento VARCHAR(255),
+    fornecedor_empresa VARCHAR(255),
+    numero_equipamento VARCHAR(50),
+    id_unidade INT,
+    id_funcionario INT,
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario)
+);
+
+CREATE TABLE FUNCIONARIOS (
+    id_funcionario INT PRIMARY KEY,
+    contato VARCHAR(20),
+    cpf VARCHAR(14) UNIQUE,
+    endereco VARCHAR(255),
+    id_ala INT,
+    salario DECIMAL(10,2),
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala)
+);
+
+CREATE TABLE MATERIAL (
+    id_material INT PRIMARY KEY,
+    contra_indicacao TEXT,
+    descricao_produto TEXT,
+    data_validade DATE,
+    qualidade VARCHAR(50),
+    nome_material VARCHAR(255),
+    id_fornecedor INT,
+    id_unidade INT,
+    id_funcionario INT,
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor),
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario)
+);
+
+CREATE TABLE FORNECEDOR (
+    id_fornecedor INT PRIMARY KEY,
+    nome_fornecedor VARCHAR(255),
+    cnpj VARCHAR(18) UNIQUE,
+    contatos VARCHAR(50),
+    contrato TEXT
+);
+
+CREATE TABLE FARMACIA (
+    id_farmacia INT PRIMARY KEY,
+    nome_remedio VARCHAR(255),
+    id_material INT,
+    bula TEXT,
+    ml_quantidade INT,
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material)
+);
+
+CREATE TABLE VISITAR (
+    id_acompanhante INT,
+    id_paciente INT,
+    PRIMARY KEY (id_acompanhante, id_paciente),
+    FOREIGN KEY (id_acompanhante) REFERENCES ACOMPANHANTE(id_acompanhante),
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente)
+);
+
+CREATE TABLE ACOMPANHAR (
+    id_acompanhante INT,
+    id_ala INT,
+    PRIMARY KEY (id_acompanhante, id_ala),
+    FOREIGN KEY (id_acompanhante) REFERENCES ACOMPANHANTE(id_acompanhante),
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala)
+);
+
+CREATE TABLE ATENDIMENTO (
+    id_ala INT,
+    id_unidade INT,
+    PRIMARY KEY (id_ala, id_unidade),
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala),
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade)
+);
+
+CREATE TABLE FORNECER_EQUIPAMENTO (
+    id_equipamento INT,
+    id_fornecedor INT,
+    PRIMARY KEY (id_equipamento, id_fornecedor),
+    FOREIGN KEY (id_equipamento) REFERENCES EQUIPAMENTOS(id_equipamento),
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor)
+);
+
+CREATE TABLE FORNECER_MATERIAL (
+    id_fornecedor INT,
+    id_material INT,
+    PRIMARY KEY (id_fornecedor, id_material),
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor),
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material)
+);
+
+CREATE TABLE UTILIZAR_MATERIAL (
+    id_material INT,
+    id_funcionario INT,
+    PRIMARY KEY (id_material, id_funcionario),
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario)
+);
