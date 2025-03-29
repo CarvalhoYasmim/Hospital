@@ -1,0 +1,341 @@
+CREATE TABLE VISITANTE (
+    id_visitante SERIAL PRIMARY KEY,
+    endereco VARCHAR(255),
+    cpf VARCHAR(14) UNIQUE
+);
+
+CREATE TABLE PACIENTE (
+    id_paciente SERIAL PRIMARY KEY,
+    contato VARCHAR(20),
+    horario_entrada TIME,
+    cpf VARCHAR(14) UNIQUE,
+    idade INT,
+    id_visitante INT,
+    FOREIGN KEY (id_visitante) REFERENCES VISITANTE(id_visitante)
+);
+
+
+CREATE TABLE ACOMPANHANTE (
+    id_acompanhante SERIAL PRIMARY KEY,
+    cpf VARCHAR(14) UNIQUE,
+    endereco VARCHAR(255),
+    id_paciente INT,
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente)
+);
+
+
+CREATE TABLE UNIDADE (
+    id_unidade SERIAL PRIMARY KEY,
+    cnpj VARCHAR(18) UNIQUE,
+    email VARCHAR(255),
+    numero_telefone VARCHAR(20),
+    cidade VARCHAR(100),
+    nome_unidade VARCHAR(255),
+    cep VARCHAR(10),
+    pais VARCHAR(50),
+    numero VARCHAR(10)
+);
+
+CREATE TABLE EQUIPAMENTOS (
+    id_equipamento SERIAL PRIMARY KEY,
+    nome_equipamento VARCHAR(255),
+    fornecedor_empresa VARCHAR(255),
+    numero_equipamento VARCHAR(50),
+    id_unidade INT,
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade)
+ 
+);
+
+alter table equipamentos add column valor decimal(10,2);
+
+CREATE TABLE ALA (
+    id_ala SERIAL PRIMARY KEY,
+    id_unidade INT,
+    especializacao VARCHAR(255),
+    id_paciente INT,
+    id_equipamento INT,
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade),
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente),
+    FOREIGN KEY (id_equipamento) REFERENCES EQUIPAMENTOS(id_equipamento)
+);
+
+CREATE TABLE FUNCIONARIOS (
+    id_funcionario SERIAL PRIMARY KEY,
+    contato VARCHAR(20),
+    cpf VARCHAR(14) UNIQUE,
+    endereco VARCHAR(255),
+	salario DECIMAL(10,2),
+    id_ala INT,
+	id_equipamento INT,
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala),
+	FOREIGN KEY (id_equipamento) REFERENCES Equipamentos(id_equipamento)
+);
+
+CREATE TABLE FORNECEDOR (
+    id_fornecedor SERIAL PRIMARY KEY,
+    nome_fornecedor VARCHAR(255),
+    cnpj VARCHAR(18) UNIQUE,
+    contatos VARCHAR(50),
+    contrato TEXT
+);
+
+CREATE TABLE MATERIAL (
+    id_material SERIAL PRIMARY KEY,
+    contra_indicacao TEXT,
+    descricao_produto TEXT,
+    data_validade DATE,
+    qualidade VARCHAR(50),
+    nome_material VARCHAR(255),
+    id_fornecedor INT,
+    id_unidade INT,
+    id_funcionario INT,
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor),
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario)
+);
+
+alter table material add column valor decimal(10,2);
+
+
+CREATE TABLE FARMACIA (
+    id_farmacia SERIAL PRIMARY KEY,
+    nome_remedio VARCHAR(255),
+    id_material INT,
+    bula TEXT,
+    ml_quantidade INT,
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material)
+);
+
+CREATE TABLE VISITAR (
+    id_acompanhante INT,
+    id_paciente INT,
+    FOREIGN KEY (id_acompanhante) REFERENCES ACOMPANHANTE(id_acompanhante),
+    FOREIGN KEY (id_paciente) REFERENCES PACIENTE(id_paciente)
+);
+
+CREATE TABLE ACOMPANHAR (
+    id_acompanhante INT,
+    id_ala INT,
+    FOREIGN KEY (id_acompanhante) REFERENCES ACOMPANHANTE(id_acompanhante),
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala)
+);
+
+CREATE TABLE ATENDIMENTO (
+    id_ala INT,
+    id_unidade INT,
+    FOREIGN KEY (id_ala) REFERENCES ALA(id_ala),
+    FOREIGN KEY (id_unidade) REFERENCES UNIDADE(id_unidade)
+);
+
+CREATE TABLE FORNECER_EQUIPAMENTO (
+    id_equipamento INT,
+    id_fornecedor INT,
+    FOREIGN KEY (id_equipamento) REFERENCES EQUIPAMENTOS(id_equipamento),
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor)
+);
+
+CREATE TABLE FORNECER_MATERIAL (
+    id_fornecedor INT,
+    id_material INT,
+    PRIMARY KEY (id_fornecedor, id_material),
+    FOREIGN KEY (id_fornecedor) REFERENCES FORNECEDOR(id_fornecedor),
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material)
+);
+
+CREATE TABLE UTILIZAR_MATERIAL (
+    id_material INT,
+    id_funcionario INT,
+    FOREIGN KEY (id_material) REFERENCES MATERIAL(id_material),
+    FOREIGN KEY (id_funcionario) REFERENCES FUNCIONARIOS(id_funcionario)
+);
+
+
+
+INSERT INTO VISITANTE (endereco, cpf) VALUES 
+('Rua das Flores, 123', '111.222.333-44'),
+('Avenida Central, 456', '222.333.444-55'),
+('Rua da Paz, 789', '333.444.555-66'),
+('Travessa Alegria, 101', '444.555.666-77'),
+('Praça das Palmeiras, 202', '555.666.777-88'),
+('Alameda dos Anjos, 303', '666.777.888-99'),
+('Beco da Esperança, 404', '777.888.999-00'),
+('Rua Sol Nascente, 505', '888.999.000-11'),
+('Avenida das Estrelas, 606', '999.000.111-22'),
+('Travessa do Horizonte, 707', '000.111.222-33');
+
+
+
+INSERT INTO PACIENTE (contato, horario_entrada, cpf, idade, id_visitante) VALUES 
+('12345-6789', '08:00:00', '111.222.333-44', 30, 1),
+('23456-7890', '09:15:00', '222.333.444-55', 25, 2),
+('34567-8901', '10:30:00', '333.444.555-66', 40, 3),
+('45678-9012', '11:45:00', '444.555.666-77', 50, 4),
+('56789-0123', '13:00:00', '555.666.777-88', 35, 5),
+('67890-1234', '14:15:00', '666.777.888-99', 29, 6),
+('78901-2345', '15:30:00', '777.888.999-00', 22, 7),
+('89012-3456', '16:45:00', '888.999.000-11', 28, 8),
+('90123-4567', '18:00:00', '999.000.111-22', 32, 9),
+('01234-5678', '19:15:00', '000.111.222-33', 38, 10);
+
+
+
+INSERT INTO ACOMPANHANTE (cpf, endereco, id_paciente) VALUES 
+('123.456.789-00', 'Rua Alegria, 11', 1),
+('234.567.890-11', 'Avenida Luz, 22', 2),
+('345.678.901-22', 'Travessa Sonho, 33', 3),
+('456.789.012-33', 'Praça Harmonia, 44', 4),
+('567.890.123-44', 'Alameda Serenidade, 55', 5),
+('678.901.234-55', 'Rua Esperança, 66', 6),
+('789.012.345-66', 'Beco Felicidade, 77', 7),
+('890.123.456-77', 'Avenida Amizade, 88', 8),
+('901.234.567-88', 'Travessa União, 99', 9),
+('012.345.678-99', 'Rua Paz, 100', 10);
+
+
+INSERT INTO UNIDADE (cnpj, email, numero_telefone, cidade, nome_unidade, cep, pais, numero) VALUES 
+('11.222.333/0001-44', 'unidade1@hospital.com', '(11) 98765-4321', 'São Paulo', 'Unidade Central', '12345-678', 'Brasil', '1001'),
+('22.333.444/0001-55', 'unidade2@hospital.com', '(21) 87654-3210', 'Rio de Janeiro', 'Unidade Zona Sul', '23456-789', 'Brasil', '1002'),
+('33.444.555/0001-66', 'unidade3@hospital.com', '(31) 76543-2109', 'Belo Horizonte', 'Unidade Norte', '34567-890', 'Brasil', '1003'),
+('44.555.666/0001-77', 'unidade4@hospital.com', '(41) 65432-1098', 'Curitiba', 'Unidade Leste', '45678-901', 'Brasil', '1004'),
+('55.666.777/0001-88', 'unidade5@hospital.com', '(51) 54321-0987', 'Porto Alegre', 'Unidade Oeste', '56789-012', 'Brasil', '1005'),
+('66.777.888/0001-99', 'unidade6@hospital.com', '(61) 43210-9876', 'Brasília', 'Unidade Centro', '67890-123', 'Brasil', '1006'),
+('77.888.999/0001-00', 'unidade7@hospital.com', '(71) 32109-8765', 'Salvador', 'Unidade Costa', '78901-234', 'Brasil', '1007'),
+('88.999.000/0001-11', 'unidade8@hospital.com', '(81) 21098-7654', 'Recife', 'Unidade Mar', '89012-345', 'Brasil', '1008'),
+('99.000.111/0001-22', 'unidade9@hospital.com', '(91) 10987-6543', 'Belém', 'Unidade Floresta', '90123-456', 'Brasil', '1009'),
+('00.111.222/0001-33', 'unidade10@hospital.com', '(11) 99876-5432', 'Campinas', 'Unidade Interior', '01234-567', 'Brasil', '1010');
+
+
+
+
+INSERT INTO EQUIPAMENTOS (nome_equipamento, fornecedor_empresa, numero_equipamento, id_unidade, valor) VALUES 
+('Ventilador Mecânico', 'Respira Bem', 'EQP-001', 1, 12000.50),
+('Monitor Cardíaco', 'CardioTech', 'EQP-002', 2, 8500.00),
+('Tomógrafo', 'ImagiMed', 'EQP-003', 3, 250000.00),
+('Ultrassom', 'SoundWave', 'EQP-004', 4, 75000.75),
+('Bomba de Infusão', 'MedSupply', 'EQP-005', 5, 3200.25),
+('Desfibrilador', 'Vida Segura', 'EQP-006', 6, 15000.00),
+('Eletrocardiógrafo', 'CardioTech', 'EQP-007', 7, 9500.99),
+('Oxímetro', 'Respira Bem', 'EQP-008', 8, 150.50),
+('Mesa Cirúrgica', 'SurgEquip', 'EQP-009', 9, 18000.45),
+('Raio-X Portátil', 'ImagiMed', 'EQP-010', 10, 67000.30);
+
+
+
+INSERT INTO ALA (id_unidade, especializacao, id_paciente, id_equipamento) VALUES 
+(1, 'Cardiologia', 1, 1),
+(2, 'Neurologia', 2, 2),
+(3, 'Ortopedia', 3, 3),
+(4, 'Pediatria', 4, 4),
+(5, 'Oncologia', 5, 5),
+(6, 'Ginecologia', 6, 6),
+(7, 'Dermatologia', 7, 7),
+(8, 'Endocrinologia', 8, 8),
+(9, 'Oftalmologia', 9, 9),
+(10, 'Radiologia', 10, 10);
+
+
+
+
+INSERT INTO FUNCIONARIOS (contato, cpf, endereco, salario, id_ala, id_equipamento) VALUES 
+('12345-6789', '987.654.321-00', 'Rua dos Médicos, 100', 3500.00, 1, 1),
+('23456-7890', '876.543.210-11', 'Avenida dos Enfermeiros, 200', 2800.00, 2, 2),
+('34567-8901', '765.432.109-22', 'Travessa dos Técnicos, 300', 4000.50, 3, 3),
+('45678-9012', '654.321.098-33', 'Praça dos Auxiliares, 400', 2700.75, 4, 4),
+('56789-0123', '543.210.987-44', 'Rua dos Socorristas, 500', 3200.00, 5, 5),
+('67890-1234', '432.109.876-55', 'Alameda dos Administradores, 600', 5500.00, 6, 6),
+('78901-2345', '321.098.765-66', 'Beco dos Gestores, 700', 6100.00, 7, 7),
+('89012-3456', '210.987.654-77', 'Rua dos Atendentes, 800', 2400.50, 8, 8),
+('90123-4567', '109.876.543-88', 'Avenida dos Motoristas, 900', 3000.00, 9, 9),
+('01234-5678', '098.765.432-99', 'Praça dos Limpeza, 1000', 1800.00, 10, 10);
+
+
+
+
+INSERT INTO FORNECEDOR (nome_fornecedor, cnpj, contatos, contrato) VALUES 
+('Respira Bem', '11.111.111/0001-22', '(11) 1111-2222', 'Contrato de fornecimento de equipamentos médicos'),
+('CardioTech', '22.222.222/0001-33', '(21) 2222-3333', 'Contrato de monitores e eletrocardiógrafos'),
+('ImagiMed', '33.333.333/0001-44', '(31) 3333-4444', 'Contrato de tomógrafos e ultrassons'),
+('SoundWave', '44.444.444/0001-55', '(41) 4444-5555', 'Contrato de ultrassons avançados'),
+('MedSupply', '55.555.555/0001-66', '(51) 5555-6666', 'Contrato de bombas de infusão'),
+('Vida Segura', '66.666.666/0001-77', '(61) 6666-7777', 'Contrato de desfibriladores'),
+('SurgEquip', '77.777.777/0001-88', '(71) 7777-8888', 'Contrato de mesas cirúrgicas'),
+('PharmaMed', '88.888.888/0001-99', '(81) 8888-9999', 'Contrato de materiais hospitalares'),
+('SafeMedic', '99.999.999/0001-00', '(91) 9999-0000', 'Contrato de equipamentos de emergência'),
+('NeoHealth', '00.000.000/0001-11', '(11) 0000-1111', 'Contrato de equipamentos neonatais');
+
+
+
+INSERT INTO MATERIAL (contra_indicacao, descricao_produto, data_validade, qualidade, nome_material, id_fornecedor, id_unidade, id_funcionario, valor) VALUES 
+('Não usar em grávidas', 'Seringa descartável 10ml', '2026-05-15', 'Alta', 'Seringa 10ml', 1, 1, 1, 5.50),
+('Evitar contato com pele', 'Álcool 70%', '2025-12-30', 'Média', 'Álcool 70%', 2, 2, 2, 3.00),
+('Apenas uso externo', 'Máscara cirúrgica', '2027-01-20', 'Alta', 'Máscara Tripla', 3, 3, 3, 0.50),
+('Não ingerir', 'Desinfetante hospitalar', '2025-11-01', 'Alta', 'Desinfetante 1L', 4, 4, 4, 7.90),
+('Evitar exposição ao sol', 'Luvas estéreis', '2026-08-10', 'Alta', 'Luvas de Procedimento', 5, 5, 5, 1.20);
+
+
+INSERT INTO FARMACIA (nome_remedio, id_material, bula, ml_quantidade) VALUES 
+('Paracetamol', 1, 'Analgésico e antitérmico', 500),
+('Ibuprofeno', 2, 'Anti-inflamatório e analgésico', 200),
+('Omeprazol', 3, 'Antiácido estomacal', 40),
+('Amoxicilina', 4, 'Antibiótico de largo espectro', 250),
+('Diazepam', 5, 'Ansiolítico', 10);
+
+INSERT INTO VISITAR (id_acompanhante, id_paciente) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+
+INSERT INTO ACOMPANHAR (id_acompanhante, id_ala) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+INSERT INTO ATENDIMENTO (id_ala, id_unidade) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+
+INSERT INTO FORNECER_EQUIPAMENTO (id_equipamento, id_fornecedor) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+INSERT INTO FORNECER_MATERIAL (id_fornecedor, id_material) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+
+select * from farmacia
