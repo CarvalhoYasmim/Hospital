@@ -1,0 +1,31 @@
+-- 1. Trigger: Antes de inserir um paciente, verificar se já existe um CPF cadastrado
+CREATE TRIGGER verificar_cpf_paciente
+BEFORE INSERT ON PACIENTE
+FOR EACH ROW
+WHEN (EXISTS (SELECT 1 FROM PACIENTE WHERE cpf = NEW.cpf))
+EXECUTE FUNCTION raise_exception('CPF já cadastrado para outro paciente');
+
+-- 2. Trigger: Após a inserção de um funcionário, registrar a data de admissão
+CREATE TRIGGER registrar_admissao_funcionario
+AFTER INSERT ON FUNCIONARIOS
+FOR EACH ROW
+EXECUTE FUNCTION registrar_admissao();
+
+-- 3. Trigger: Após a exclusão de um equipamento, registrar um log de remoção
+CREATE TRIGGER log_remocao_equipamento
+AFTER DELETE ON EQUIPAMENTOS
+FOR EACH ROW
+EXECUTE FUNCTION registrar_log_remocao();
+
+-- 4. Trigger: Antes de atualizar o salário de um funcionário, armazenar o salário anterior
+CREATE TRIGGER armazenar_salario_anterior
+BEFORE UPDATE OF salario ON FUNCIONARIOS
+FOR EACH ROW
+EXECUTE FUNCTION armazenar_salario_antigo();
+
+-- 5. Trigger: Após inserir um novo material, verificar se a validade é superior a 6 meses
+CREATE TRIGGER verificar_validade_material
+BEFORE INSERT ON MATERIAL
+FOR EACH ROW
+WHEN (NEW.data_validade <= NOW() + INTERVAL '6 months')
+EXECUTE FUNCTION raise_exception('Material com validade inferior a 6 meses não pode ser cadastrado');
