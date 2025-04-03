@@ -1,0 +1,21 @@
+-- 1. View Materializada: Total de materiais disponíveis por unidade
+CREATE MATERIALIZED VIEW mv_total_materiais_unidade AS
+SELECT u.id_unidade, u.nome_unidade, COUNT(m.id_material) AS total_materiais
+FROM UNIDADE u
+LEFT JOIN MATERIAL m ON u.id_unidade = m.id_unidade
+GROUP BY u.id_unidade, u.nome_unidade;
+
+-- 2. View Materializada: Histórico de fornecimento de equipamentos
+CREATE MATERIALIZED VIEW mv_historico_fornecimento_equipamentos AS
+SELECT fe.id_fornecedor, f.nome_fornecedor, fe.id_equipamento, e.nome_equipamento
+FROM FORNECER_EQUIPAMENTO fe
+JOIN FORNECEDOR f ON fe.id_fornecedor = f.id_fornecedor
+JOIN EQUIPAMENTOS e ON fe.id_equipamento = e.id_equipamento;
+
+-- 3. View Materializada: Registro de atendimentos por ala e unidade
+CREATE MATERIALIZED VIEW mv_registro_atendimentos AS
+SELECT a.id_ala, a.especializacao, u.id_unidade, u.nome_unidade, COUNT(p.id_paciente) AS total_pacientes
+FROM ALA a
+JOIN UNIDADE u ON a.id_unidade = u.id_unidade
+LEFT JOIN PACIENTE p ON a.id_paciente = p.id_paciente
+GROUP BY a.id_ala, a.especializacao, u.id_unidade, u.nome_unidade;
