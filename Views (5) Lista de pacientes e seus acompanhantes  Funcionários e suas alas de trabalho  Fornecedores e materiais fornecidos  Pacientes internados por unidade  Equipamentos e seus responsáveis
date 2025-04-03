@@ -1,0 +1,31 @@
+-- 1. View: Lista de pacientes e seus acompanhantes
+CREATE VIEW vw_pacientes_acompanhantes AS
+SELECT p.id_paciente, p.cpf AS cpf_paciente, a.id_acompanhante, a.cpf AS cpf_acompanhante
+FROM PACIENTE p
+LEFT JOIN ACOMPANHANTE a ON p.id_acompanhante = a.id_acompanhante;
+
+-- 2. View: Funcionários e suas alas de trabalho
+CREATE VIEW vw_funcionarios_alas AS
+SELECT f.id_funcionario, f.cpf, f.contato, a.id_ala, a.especializacao
+FROM FUNCIONARIOS f
+JOIN ALA a ON f.id_ala = a.id_ala;
+
+-- 3. View: Fornecedores e materiais fornecidos
+CREATE VIEW vw_fornecedores_materiais AS
+SELECT m.id_material, m.nome_material, f.id_fornecedor, f.nome_fornecedor
+FROM MATERIAL m
+JOIN FORNECER_MATERIAL fm ON m.id_material = fm.id_material
+JOIN FORNECEDOR f ON fm.id_fornecedor = f.id_fornecedor;
+
+-- 4. View: Pacientes internados por unidade
+CREATE VIEW vw_pacientes_unidade AS
+SELECT p.id_paciente, p.cpf, u.id_unidade, u.nome_unidade
+FROM PACIENTE p
+JOIN ALA a ON p.id_paciente = a.id_paciente
+JOIN UNIDADE u ON a.id_unidade = u.id_unidade;
+
+-- 5. View: Equipamentos e seus responsáveis
+CREATE VIEW vw_equipamentos_responsaveis AS
+SELECT e.id_equipamento, e.nome_equipamento, f.id_funcionario, f.cpf AS cpf_responsavel
+FROM EQUIPAMENTOS e
+JOIN FUNCIONARIOS f ON e.id_funcionario = f.id_funcionario;
