@@ -1,0 +1,40 @@
+-- 1. Procedimento para registrar novo paciente com acompanhante e visitante
+CREATE PROCEDURE registrar_paciente(
+    IN cpf_paciente VARCHAR(14),
+    IN contato_paciente VARCHAR(20),
+    IN idade_paciente INT,
+    IN cpf_acompanhante VARCHAR(14),
+    IN cpf_visitante VARCHAR(14)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO PACIENTE (cpf, contato, idade) VALUES (cpf_paciente, contato_paciente, idade_paciente);
+    INSERT INTO ACOMPANHANTE (cpf) VALUES (cpf_acompanhante);
+    INSERT INTO VISITANTE (cpf) VALUES (cpf_visitante);
+END;
+$$;
+
+-- 2. Procedimento para atualizar o salário de um funcionário
+CREATE PROCEDURE atualizar_salario(
+    IN id_funcionario_param INT,
+    IN novo_salario DECIMAL(10,2)
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE FUNCIONARIOS SET salario = novo_salario WHERE id_funcionario = id_funcionario_param;
+END;
+$$;
+
+-- 3. Procedimento para remover um equipamento de uma unidade e registrar em um log
+CREATE PROCEDURE remover_equipamento(
+    IN id_equipamento_param INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM EQUIPAMENTOS WHERE id_equipamento = id_equipamento_param;
+    INSERT INTO LOG_REMOVER_EQUIPAMENTO (id_equipamento, data_remocao) VALUES (id_equipamento_param, NOW());
+END;
+$$;
