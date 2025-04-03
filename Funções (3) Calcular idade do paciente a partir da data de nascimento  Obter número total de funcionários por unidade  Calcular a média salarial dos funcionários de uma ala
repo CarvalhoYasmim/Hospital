@@ -1,0 +1,28 @@
+-- 1. Função para calcular a idade do paciente a partir da data de nascimento
+CREATE FUNCTION calcular_idade(data_nascimento DATE) RETURNS INT AS $$
+BEGIN
+    RETURN EXTRACT(YEAR FROM AGE(data_nascimento));
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. Função para obter o número total de funcionários por unidade
+CREATE FUNCTION total_funcionarios_unidade(id_unidade_param INT) RETURNS INT AS $$
+DECLARE
+    total INT;
+BEGIN
+    SELECT COUNT(*) INTO total FROM FUNCIONARIOS f
+    JOIN ALA a ON f.id_ala = a.id_ala
+    WHERE a.id_unidade = id_unidade_param;
+    RETURN total;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 3. Função para calcular a média salarial dos funcionários de uma ala
+CREATE FUNCTION media_salarial_ala(id_ala_param INT) RETURNS DECIMAL(10,2) AS $$
+DECLARE
+    media_salarial DECIMAL(10,2);
+BEGIN
+    SELECT AVG(salario) INTO media_salarial FROM FUNCIONARIOS WHERE id_ala = id_ala_param;
+    RETURN COALESCE(media_salarial, 0);
+END;
+$$ LANGUAGE plpgsql;
